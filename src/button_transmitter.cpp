@@ -1090,7 +1090,7 @@ void wifiSTAcheck() {
             if (wifiAPconnected != 1) {
                 wifiSTAon = 1;
 
-                timer.enable(timertimeNetUpdate);  // NTP
+                // timer.enable(timertimeNetUpdate);  // NTP
                 zapamietanyCzasOLED = aktualnyCzas;
                 SMSbuf = "IP: " + WiFi.localIP().toString() + "";
                 realTimeUpdate();
@@ -2418,8 +2418,8 @@ void Qtimers::winterSummerLastSunday() {
     }
 }
 void Qtimers::winterSummerTime() {
-    if (active == 1 && Qyear > 2020) {  // ! cos nie tak...
-        if (isWinter == 0 && (((Qmonth >= 10 && Qday >= lastSundayOctober) || (Qmonth <= 3 && Qday < lastSundayMarch)) || (Qmonth > 10 || (Qmonth <= 3 && Qday < lastSundayMarch)))) {
+    if (active == 1 && Qyear > 2020) {
+        if (isWinter == 0 && (Qmonth >= 10 || Qmonth <= 3) && Qday >= lastSundayOctober) {
             correctionTime -= 3600;
             setTime(String(Timestamp).toInt() + correctionTime);
             isWinter = 1;
@@ -2452,7 +2452,10 @@ void Qtimers::tdcomp() {
         realTimeMinutes = Qhour * 60 + Qminutes;
         if (QtFWCheck) updatefw = FirmwareVersionCheck();
 
-        if (tStart == 1 && (monthStart == 0 || Qmonth == monthStart) && (dayStart == 0 || Qday == dayStart) && ((hourCompare && ((realTimeMinutes >= startTimeMinutes) || (realTimeMinutes < endTimeMinutes))) || (!hourCompare && ((realTimeMinutes >= startTimeMinutes) && (realTimeMinutes < endTimeMinutes))))) {
+        // ! blad gdy ustawiamy month day - nie uruchomi/wylaczy sie gdy bedzie po dniu, miesiacu. Trzeba naprawic.
+
+        if (tStart == 1 && (monthStart == 0 || Qmonth == monthStart) && (dayStart == 0 || Qday == dayStart) &&
+            ((hourCompare && ((realTimeMinutes >= startTimeMinutes) || (realTimeMinutes < endTimeMinutes))) || (!hourCompare && ((realTimeMinutes >= startTimeMinutes) && (realTimeMinutes < endTimeMinutes))))) {
             tStart = 0;
             tStop = 1;
             if (serialmode == 1) Serial.print(" Qtimer - tdcomp START ");
